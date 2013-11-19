@@ -12,7 +12,7 @@ function [] = export_output( result, filename)
 			fprintf(fid, 'count: %d \r\n', result(i).count);
 			fclose(fid); 
 		end
-		dlmwrite(filename,result(i).xy,'-append');
+		dlmwrite(filename,result(i).xy,'-append', 'newline', 'pc');
 	end
 end
 

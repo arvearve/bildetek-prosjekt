@@ -24,7 +24,7 @@ mask = distanceTransform > distanceThresh;
 imwrite( mask, strcat(output_folder, '\4_Mask.png'));
 imwrite( I + repmat(mask, [1 1 3]), strcat(output_folder, '\5_ImageWithMask.png'));
 
-%grow the mask so  it covers more of the smartie.
+%Shrink the mask into points.
 mask = bwmorph(mask, 'shrink', Inf);
 imwrite( mask, strcat(output_folder, '\6_Points.png'));
 end

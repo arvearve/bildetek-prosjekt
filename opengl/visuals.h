@@ -9,7 +9,6 @@ extern int g_iErrorCode ;
 
 extern unsigned char g_eCurrentScene;
 extern  float rot_angle;
-
 typedef struct
 {
 	double R;
@@ -41,7 +40,7 @@ void SetupGL();
 void LoadResources();
 
 void RenderGroup(std::vector<Coordinate> coordinates, Color color, int modelNum);
-
+void RenderGroupCount(int count, int offset);
 // DisplayGL :  The function responsible for drawing everything in the
 // OpenGL context associated to a window.
 void DisplayGL();
@@ -52,8 +51,9 @@ void KeyboardGL( unsigned char c, int x, int y );
 
 // MouseGL :  This functions is called whenever the mouse is used
 // inside the opengl window
-void MouseGL( int button, int state, int x, int y );
+void mosue_moved(int x, int y );
 
+void resetPointer();
 // Handle the window size changes and define the world coordinate
 // system and projection type
 void ReshapeGL( int w, int h );

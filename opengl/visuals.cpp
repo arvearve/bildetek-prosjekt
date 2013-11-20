@@ -9,7 +9,7 @@
 #include <time.h>
 #include "shader.hpp"
 #include "RgbImage.h"
-
+#include <string>
 
 
 #include <string>
@@ -22,7 +22,9 @@
 
 
 #define PI 3.14159265359
-
+float cam_alpha;
+float cam_theta;
+float cam_radius;
 typedef struct
 {
 	GLfloat x;
@@ -133,7 +135,33 @@ void ReshapeGL(int w, int h)
 	glViewport(0, 0, 800, 600);
 }
 
+void mouse_moved( int x, int y ){
+	float center_x = g_iWindowWidth / 2;
+	float center_y = g_iWindowHeight / 2;
 
+	float dx = x - center_x;
+	float dy = y - center_y;
+
+	cam_alpha += dx;
+	cam_theta += dy;
+
+	int r = cam_radius;
+	if(cam_theta >= 90){ cam_theta = 90;}
+	float cam_result_x = 0.5+r*cos(cam_alpha/100.0f)*sin(cam_theta/100); 
+	float cam_result_z = 0.5+r*sin(cam_alpha/100.0f)*sin(cam_theta/100);
+	float cam_result_y = r*cos(cam_theta/100.0f);
+
+	View = glm::lookAt(
+		glm::vec3(cam_result_x, cam_result_y, cam_result_z), // Camera is at (4,3,3), in World Space
+		glm::vec3(0, 0, 0), // and looks at the origin
+		glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
+	);
+
+}
+
+void resetPointer(){
+	
+}
 void KeyboardGL(unsigned char c, int x, int y)
 {
 	switch (c)
@@ -196,7 +224,7 @@ void DisplayGL()
 	// and the depth buffer
 
 	RenderScene();
-
+	resetPointer();
 	glutSwapBuffers();
 	// All drawing commands applied to the
 	// hidden buffer, so now, bring forward
@@ -256,7 +284,9 @@ void RenderScene()
 	for (std::vector<Group>::iterator it = (*Data).begin(); it != (*Data).end(); ++it)
 	{
 		RenderGroup(it->items, it->color, modelNum++);
+		RenderGroupCount(it->items.size(), 0);
 	}
+	glutWarpPointer(g_iWindowWidth/2, g_iWindowHeight/2);
 }
 
 void CreateInstancedTransformMatrices(std::vector<Coordinate> coordinates)
@@ -331,6 +361,14 @@ void RenderGroup(std::vector<Coordinate> coordinates, Color color, int modelNum)
 	glDisableVertexAttribArray(0);
 }
 
+void RenderGroupCount(int count, int offset){
+	// convert to expected format
+	std::string c = std::to_string(count);
+	const unsigned char * d = (const unsigned char*)c.c_str();
+	glutStrokeString(GLUT_STROKE_ROMAN, d);
+
+}
+
 
 void SetupGL()
 {
@@ -365,6 +403,10 @@ void SetupGL()
 	// Register GLUT callbacks
 	glutDisplayFunc(DisplayGL);
 	glutKeyboardFunc(KeyboardGL);
+	glutPassiveMotionFunc(mouse_moved);
+	resetPointer();
+	cam_radius = 6;
+	glutSetCursor(GLUT_CURSOR_NONE);
 	glutReshapeFunc(ReshapeGL);
 
 	// Setup initial GL State
